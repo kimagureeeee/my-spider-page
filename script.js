@@ -1,17 +1,30 @@
 const slots = document.querySelectorAll(".slot");
 
 // --------------------
-// カード準備
+// カード準備（52枚ランダム）
 // --------------------
+const suits = ["♡", "♧", "♤", "♢"];
+const numbers = Array.from({ length: 13 }, (_, i) => i + 1);
+
 let cards = [];
-for (let num = 1; num <= 13; num++) {
-    cards.push(num);
-    cards.push(num);
+for (const suit of suits) {
+    for (const number of numbers) {
+        cards.push({ number, suit });
+    }
 }
 
-// 各列の枚数
-const counts = [3, 3, 3, 3, 3, 3, 2, 2, 2, 2];
+// シャッフル（Fisher-Yates）
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
 
+shuffle(cards);
+
+// 各列の枚数（52枚を10列に分配）
+const counts = [6,6,6,6,6,6,6,6,5,5]; // 合計52枚
 let index = 0;
 
 // 選択中カード
@@ -22,7 +35,8 @@ let selectedCard = null;
 // --------------------
 for (let i = 0; i < slots.length; i++) {
     for (let j = 0; j < counts[i]; j++) {
-        const card = createCard(cards[index], j === counts[i] - 1);
+        const cardData = cards[index];
+        const card = createCard(cardData.number, cardData.suit, j === counts[i] - 1);
         card.style.top = `${j * 20}px`;
         slots[i].appendChild(card);
         index++;
@@ -32,19 +46,22 @@ for (let i = 0; i < slots.length; i++) {
 // --------------------
 // カード生成
 // --------------------
-function createCard(number, isFront) {
+function createCard(number, suit, isFront) {
     const card = document.createElement("div");
     card.classList.add("card");
 
+    card.textContent = `${number}${suit}`; // 中央に表示される
+
     if (isFront) {
         card.classList.add("front");
-        card.textContent = number;
         card.addEventListener("click", () => onCardClick(card));
     } else {
         card.classList.add("back");
     }
 
     card.dataset.number = number;
+    card.dataset.suit = suit;
+
     return card;
 }
 
@@ -52,21 +69,18 @@ function createCard(number, isFront) {
 // クリック処理
 // --------------------
 function onCardClick(card) {
-    // 選択済みカードがない場合
     if (!selectedCard) {
         selectedCard = card;
         card.classList.add("selected");
         return;
     }
 
-    // 同じカードを押したら解除
     if (selectedCard === card) {
         card.classList.remove("selected");
         selectedCard = null;
         return;
     }
 
-    // 2回目クリック：移動判定
     const fromNumber = Number(selectedCard.dataset.number);
     const toNumber = Number(card.dataset.number);
 
@@ -78,12 +92,14 @@ function onCardClick(card) {
     selectedCard = null;
 }
 
-// カードの塊をまとめて移動
+// --------------------
+// カードの塊移動
+// --------------------
 function moveCardsStack(card, targetSlot) {
     const fromSlot = card.parentElement;
     const cardsInFromSlot = Array.from(fromSlot.querySelectorAll(".card"));
 
-    // クリックしたカード以降のカードすべてをまとめて移動
+    // クリックしたカード以降のカードすべてを移動
     const movingCards = cardsInFromSlot.slice(cardsInFromSlot.indexOf(card));
 
     movingCards.forEach((c, i) => {
@@ -98,7 +114,7 @@ function moveCardsStack(card, targetSlot) {
         const topCard = remainingCards[remainingCards.length - 1];
         topCard.classList.remove("back");
         topCard.classList.add("front");
-        topCard.textContent = topCard.dataset.number;
+        topCard.textContent = `${topCard.dataset.number}${topCard.dataset.suit}`;
         topCard.addEventListener("click", () => onCardClick(topCard));
     }
 }

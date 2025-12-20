@@ -19,7 +19,7 @@ h1 {
 /* 列 */
 .slot {
     width: 70px;
-    min-height: 300px;
+    min-height: 400px;
     position: relative;
 }
 
@@ -34,17 +34,12 @@ h1 {
     top: 0;
     cursor: pointer;
     font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* カード番号の表示を上部に固定 */
-.card span {
-    position: absolute;
-    top: 5px;     /* 上からの距離 */
-    left: 50%;
-    transform: translateX(-50%);
-    font-weight: bold;
-}
-
+/* 表・裏 */
 .card.front {
     background: white;
     color: black;
@@ -55,8 +50,6 @@ h1 {
     color: rgba(255,255,255,0.8); /* 透けて見える */
     cursor: default;
 }
-
-
 
 /* 選択中 */
 .card.selected {
