@@ -31,21 +31,31 @@ h1 {
     border-radius: 6px;
     position: absolute;
     left: 5px;
-    text-align: center;
-    line-height: 90px;
-    font-size: 18px;
+    top: 0;
     cursor: pointer;
+    font-size: 18px;
+}
+
+/* カード番号の表示を上部に固定 */
+.card span {
+    position: absolute;
+    top: 5px;     /* 上からの距離 */
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
 }
 
 .card.front {
     background: white;
+    color: black;
 }
 
 .card.back {
     background: #333;
-    color: rgba(255, 255, 255, 0.3); /* 薄い白で番号を見せる */
+    color: rgba(255,255,255,0.8); /* 透けて見える */
     cursor: default;
 }
+
 
 
 /* 選択中 */
