@@ -35,9 +35,9 @@ for (let i = 0; i < slots.length; i++) {
     for (let j = 0; j < counts[i]; j++) {
         const cardData = cards[index];
         const card = createCard(cardData.number, cardData.suit, j === counts[i] - 1);
-        // カードをずらす
+        // カードを少しずつずらして重ねる
         card.style.top = `${j * 20}px`;
-        card.style.left = `${5 + j * 2}px`;
+        card.style.left = `5px`;
         slots[i].appendChild(card);
         index++;
     }
@@ -50,16 +50,16 @@ function createCard(number, suit, isFront) {
     const card = document.createElement("div");
     card.classList.add("card");
 
-    const label = document.createElement("div");
-    label.classList.add("label");
-    label.textContent = `${number}${suit}`;
-    card.appendChild(label);
-
     if (isFront) {
         card.classList.add("front");
+        const label = document.createElement("div");
+        label.classList.add("label");
+        label.textContent = `${number}${suit}`;
+        card.appendChild(label);
         card.addEventListener("click", () => onCardClick(card));
     } else {
         card.classList.add("back");
+        // 裏カードはlabelを作らない（何も見えない）
     }
 
     card.dataset.number = number;
@@ -96,7 +96,7 @@ function onCardClick(card) {
 }
 
 // --------------------
-// カードの塊移動（ずらしを維持）
+// カードの塊移動
 // --------------------
 function moveCardsStack(card, targetSlot) {
     const fromSlot = card.parentElement;
@@ -108,7 +108,7 @@ function moveCardsStack(card, targetSlot) {
     movingCards.forEach((c, i) => {
         c.remove();
         c.style.top = `${(targetSlot.children.length + i) * 20}px`;
-        c.style.left = `${5 + (targetSlot.children.length + i) * 2}px`; // ずらしを維持
+        c.style.left = `5px`;
         targetSlot.appendChild(c);
     });
 
@@ -118,7 +118,12 @@ function moveCardsStack(card, targetSlot) {
         const topCard = remainingCards[remainingCards.length - 1];
         topCard.classList.remove("back");
         topCard.classList.add("front");
-        topCard.querySelector(".label").textContent = `${topCard.dataset.number}${topCard.dataset.suit}`;
+
+        const label = document.createElement("div");
+        label.classList.add("label");
+        label.textContent = `${topCard.dataset.number}${topCard.dataset.suit}`;
+        topCard.appendChild(label);
+
         topCard.addEventListener("click", () => onCardClick(topCard));
     }
 }

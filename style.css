@@ -29,7 +29,6 @@ h1 {
     border: 1px solid black;
     border-radius: 6px;
     position: absolute;
-    left: 5px;
     cursor: pointer;
     font-size: 18px;
     background-color: white;
@@ -43,7 +42,6 @@ h1 {
 
 .card.back {
     background: #333;
-    color: black; /* 下の数字は透けるのではなく見える */
     cursor: default;
 }
 
