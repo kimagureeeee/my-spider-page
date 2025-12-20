@@ -24,7 +24,7 @@ function shuffle(array) {
 shuffle(cards);
 
 // 各列の枚数（52枚を10列に分配）
-const counts = [6,6,6,6,6,6,6,6,5,5];
+const counts = [6,6,6,6,6,6,6,6,5,5]; // 合計52枚
 let index = 0;
 let selectedCard = null;
 
@@ -32,13 +32,15 @@ let selectedCard = null;
 // 初期配置（ずらして積む）
 // --------------------
 for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i];
     for (let j = 0; j < counts[i]; j++) {
         const cardData = cards[index];
-        const card = createCard(cardData.number, cardData.suit, j === counts[i] - 1);
-        // カードを少しずつずらして重ねる
+        // 一番手前のカードは表、それ以外は裏
+        const isFront = (j === counts[i] - 1);
+        const card = createCard(cardData.number, cardData.suit, isFront);
         card.style.top = `${j * 20}px`;
         card.style.left = `5px`;
-        slots[i].appendChild(card);
+        slot.appendChild(card);
         index++;
     }
 }
@@ -59,7 +61,7 @@ function createCard(number, suit, isFront) {
         card.addEventListener("click", () => onCardClick(card));
     } else {
         card.classList.add("back");
-        // 裏カードはlabelを作らない（何も見えない）
+        // 裏カードは数字なし
     }
 
     card.dataset.number = number;
@@ -79,7 +81,7 @@ function onCardClick(card) {
     }
 
     if (selectedCard === card) {
-        selectedCard.classList.remove("selected");
+        card.classList.remove("selected");
         selectedCard = null;
         return;
     }
@@ -102,7 +104,6 @@ function moveCardsStack(card, targetSlot) {
     const fromSlot = card.parentElement;
     const cardsInFromSlot = Array.from(fromSlot.querySelectorAll(".card"));
 
-    // クリックしたカード以降を移動
     const movingCards = cardsInFromSlot.slice(cardsInFromSlot.indexOf(card));
 
     movingCards.forEach((c, i) => {
