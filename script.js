@@ -13,7 +13,7 @@ for (const suit of suits) {
     }
 }
 
-// シャッフル（Fisher-Yates）
+// シャッフル
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -24,20 +24,20 @@ function shuffle(array) {
 shuffle(cards);
 
 // 各列の枚数（52枚を10列に分配）
-const counts = [6,6,6,6,6,6,6,6,5,5]; // 合計52枚
+const counts = [6,6,6,6,6,6,6,6,5,5];
 let index = 0;
-
-// 選択中カード
 let selectedCard = null;
 
 // --------------------
-// 初期配置
+// 初期配置（ずらして積む）
 // --------------------
 for (let i = 0; i < slots.length; i++) {
     for (let j = 0; j < counts[i]; j++) {
         const cardData = cards[index];
         const card = createCard(cardData.number, cardData.suit, j === counts[i] - 1);
+        // カードをずらす
         card.style.top = `${j * 20}px`;
+        card.style.left = `${5 + j * 2}px`;
         slots[i].appendChild(card);
         index++;
     }
@@ -50,7 +50,10 @@ function createCard(number, suit, isFront) {
     const card = document.createElement("div");
     card.classList.add("card");
 
-    card.textContent = `${number}${suit}`; // 中央に表示される
+    const label = document.createElement("div");
+    label.classList.add("label");
+    label.textContent = `${number}${suit}`;
+    card.appendChild(label);
 
     if (isFront) {
         card.classList.add("front");
@@ -76,7 +79,7 @@ function onCardClick(card) {
     }
 
     if (selectedCard === card) {
-        card.classList.remove("selected");
+        selectedCard.classList.remove("selected");
         selectedCard = null;
         return;
     }
@@ -93,18 +96,19 @@ function onCardClick(card) {
 }
 
 // --------------------
-// カードの塊移動
+// カードの塊移動（ずらしを維持）
 // --------------------
 function moveCardsStack(card, targetSlot) {
     const fromSlot = card.parentElement;
     const cardsInFromSlot = Array.from(fromSlot.querySelectorAll(".card"));
 
-    // クリックしたカード以降のカードすべてを移動
+    // クリックしたカード以降を移動
     const movingCards = cardsInFromSlot.slice(cardsInFromSlot.indexOf(card));
 
     movingCards.forEach((c, i) => {
         c.remove();
         c.style.top = `${(targetSlot.children.length + i) * 20}px`;
+        c.style.left = `${5 + (targetSlot.children.length + i) * 2}px`; // ずらしを維持
         targetSlot.appendChild(c);
     });
 
@@ -114,7 +118,7 @@ function moveCardsStack(card, targetSlot) {
         const topCard = remainingCards[remainingCards.length - 1];
         topCard.classList.remove("back");
         topCard.classList.add("front");
-        topCard.textContent = `${topCard.dataset.number}${topCard.dataset.suit}`;
+        topCard.querySelector(".label").textContent = `${topCard.dataset.number}${topCard.dataset.suit}`;
         topCard.addEventListener("click", () => onCardClick(topCard));
     }
 }

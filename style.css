@@ -16,7 +16,6 @@ h1 {
     gap: 12px;
 }
 
-/* 列 */
 .slot {
     width: 70px;
     min-height: 400px;
@@ -31,12 +30,9 @@ h1 {
     border-radius: 6px;
     position: absolute;
     left: 5px;
-    top: 0;
     cursor: pointer;
     font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-color: white;
 }
 
 /* 表・裏 */
@@ -47,8 +43,17 @@ h1 {
 
 .card.back {
     background: #333;
-    color: rgba(255,255,255,0.8); /* 透けて見える */
+    color: black; /* 下の数字は透けるのではなく見える */
     cursor: default;
+}
+
+/* 数字・スートを左上に表示 */
+.card .label {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-weight: bold;
+    font-size: 16px;
 }
 
 /* 選択中 */
