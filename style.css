@@ -2,10 +2,12 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f8f8f8;
     margin: 0;
+    padding: 0;
 }
 
 h1 {
     text-align: center;
+    margin-top: 20px;
 }
 
 #columns {
@@ -15,22 +17,22 @@ h1 {
     margin-top: 20px;
 }
 
+/* 枠（列） */
 .slot {
     width: 70px;
-    height: 100px;
+    min-height: 120px;
     border: 2px dashed #555;
+    padding: 5px;
 }
 
-#field {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
+/* カード */
 .card {
     width: 60px;
     height: 90px;
     border: 1px solid black;
+    background: white;
     text-align: center;
     line-height: 90px;
+    margin-bottom: 5px;
+    font-size: 18px;
 }
