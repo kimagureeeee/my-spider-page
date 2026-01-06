@@ -45,13 +45,12 @@ let selectedCard = null;
 for (let i = 0; i < slots.length; i++) {
     const slot = slots[i];
     for (let j = 0; j < counts[i]; j++) {
-        const cardData = cards[index];
-        const isFront = (j === counts[i] - 1);
-        const card = createCard(cardData.number, cardData.suit, isFront);
+        const data = cards[index++];
+        const isFront = j === counts[i] - 1;
+        const card = createCard(data.number, data.suit, isFront);
         card.style.top = `${j * 20}px`;
-        card.style.left = `5px`;
+        card.style.left = "5px";
         slot.appendChild(card);
-        index++;
     }
 }
 
@@ -61,13 +60,12 @@ for (let i = 0; i < slots.length; i++) {
 function createCard(number, suit, isFront) {
     const card = document.createElement("div");
     card.classList.add("card");
-
     card.dataset.number = number;
     card.dataset.suit = suit;
 
     if (isFront) {
         card.classList.add("front");
-        addLabel(card);
+        setLabel(card);
         card.addEventListener("click", () => onCardClick(card));
     } else {
         card.classList.add("back");
@@ -75,7 +73,7 @@ function createCard(number, suit, isFront) {
     return card;
 }
 
-function addLabel(card) {
+function setLabel(card) {
     card.innerHTML = "";
     const label = document.createElement("div");
     label.classList.add("label");
@@ -99,20 +97,14 @@ function onCardClick(card) {
         return;
     }
 
-    const fromNum = Number(selectedCard.dataset.number);
-    const toNum = Number(card.dataset.number);
-
-    // ★ 連番であればスートは不問
-    if (fromNum + 1 === toNum) {
-        moveCardsStack(selectedCard, card.parentElement);
-    }
+    moveCardsStack(selectedCard, card.parentElement);
 
     selectedCard.classList.remove("selected");
     selectedCard = null;
 }
 
 // --------------------
-// 同じスートの連番か（移動可否）
+// 同一スート連番チェック（移動用）
 // --------------------
 function isValidStack(cards) {
     for (let i = 0; i < cards.length - 1; i++) {
@@ -120,10 +112,7 @@ function isValidStack(cards) {
         const n2 = Number(cards[i + 1].dataset.number);
         const s1 = cards[i].dataset.suit;
         const s2 = cards[i + 1].dataset.suit;
-
-        if (n1 !== n2 + 1 || s1 !== s2) {
-            return false;
-        }
+        if (n1 !== n2 + 1 || s1 !== s2) return false;
     }
     return true;
 }
@@ -133,12 +122,24 @@ function isValidStack(cards) {
 // --------------------
 function moveCardsStack(card, targetSlot) {
     const fromSlot = card.parentElement;
-    const cardsInFromSlot = Array.from(fromSlot.querySelectorAll(".card"));
-    const movingCards = cardsInFromSlot.slice(cardsInFromSlot.indexOf(card));
+    if (fromSlot === targetSlot) return;
 
-    // ★ 移動できるのは同一スートの連番のみ
+    const fromCards = Array.from(fromSlot.querySelectorAll(".card"));
+    const movingCards = fromCards.slice(fromCards.indexOf(card));
+
+    // ★ 移動できる塊は同一スート連番のみ
     if (!isValidStack(movingCards)) return;
 
+    // ★ 置き先判定：一番上のカードと数字が連番ならOK（スート不問）
+    const targetCards = Array.from(targetSlot.querySelectorAll(".card"));
+    if (targetCards.length > 0) {
+        const top = targetCards[targetCards.length - 1];
+        const fromNum = Number(movingCards[0].dataset.number);
+        const toNum = Number(top.dataset.number);
+        if (fromNum + 1 !== toNum) return;
+    }
+
+    // 移動
     movingCards.forEach((c, i) => {
         c.remove();
         c.style.top = `${(targetSlot.children.length + i) * 20}px`;
@@ -146,14 +147,14 @@ function moveCardsStack(card, targetSlot) {
         targetSlot.appendChild(c);
     });
 
-    flipTopCard(fromSlot);
+    flipTop(fromSlot);
     checkComplete(targetSlot);
 }
 
 // --------------------
 // 裏カードを表に
 // --------------------
-function flipTopCard(slot) {
+function flipTop(slot) {
     const cards = slot.querySelectorAll(".card");
     if (cards.length === 0) return;
 
@@ -161,13 +162,13 @@ function flipTopCard(slot) {
     if (top.classList.contains("back")) {
         top.classList.remove("back");
         top.classList.add("front");
-        addLabel(top);
+        setLabel(top);
         top.addEventListener("click", () => onCardClick(top));
     }
 }
 
 // --------------------
-// 1～13 完成チェック
+// 1〜13 完成チェック
 // --------------------
 function checkComplete(slot) {
     const cards = Array.from(slot.querySelectorAll(".card"));
@@ -184,22 +185,19 @@ function checkComplete(slot) {
     }
 
     last13.forEach(c => c.remove());
-    flipTopCard(slot);
+    flipTop(slot);
     createCompletedCard(suit);
 }
 
 // --------------------
-// 完成カード生成（左下）
+// 完成カード生成
 // --------------------
 function createCompletedCard(suit) {
     const card = document.createElement("div");
     card.classList.add("card", "front");
-    card.style.position = "relative";
-
     const label = document.createElement("div");
     label.classList.add("label");
     label.textContent = `1～13${suit}`;
-
     card.appendChild(label);
     completedArea.appendChild(card);
 }
