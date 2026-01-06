@@ -1,7 +1,7 @@
 const slots = document.querySelectorAll(".slot");
 
 // --------------------
-// 完成済み置き場（左下）
+// 完成カード置き場（左下）
 // --------------------
 const completedArea = document.createElement("div");
 completedArea.style.position = "fixed";
@@ -72,7 +72,6 @@ function createCard(number, suit, isFront) {
     } else {
         card.classList.add("back");
     }
-
     return card;
 }
 
@@ -102,11 +101,9 @@ function onCardClick(card) {
 
     const fromNum = Number(selectedCard.dataset.number);
     const toNum = Number(card.dataset.number);
-    const fromSuit = selectedCard.dataset.suit;
-    const toSuit = card.dataset.suit;
 
-    // 数字が1つ違い、かつスートが同じ
-    if (fromNum + 1 === toNum && fromSuit === toSuit) {
+    // ★ 連番であればスートは不問
+    if (fromNum + 1 === toNum) {
         moveCardsStack(selectedCard, card.parentElement);
     }
 
@@ -115,7 +112,7 @@ function onCardClick(card) {
 }
 
 // --------------------
-// 同じスート連番かチェック
+// 同じスートの連番か（移動可否）
 // --------------------
 function isValidStack(cards) {
     for (let i = 0; i < cards.length - 1; i++) {
@@ -139,7 +136,7 @@ function moveCardsStack(card, targetSlot) {
     const cardsInFromSlot = Array.from(fromSlot.querySelectorAll(".card"));
     const movingCards = cardsInFromSlot.slice(cardsInFromSlot.indexOf(card));
 
-    // ★ 同じスートの連番でなければ移動不可
+    // ★ 移動できるのは同一スートの連番のみ
     if (!isValidStack(movingCards)) return;
 
     movingCards.forEach((c, i) => {
@@ -154,7 +151,7 @@ function moveCardsStack(card, targetSlot) {
 }
 
 // --------------------
-// 裏→表にする
+// 裏カードを表に
 // --------------------
 function flipTopCard(slot) {
     const cards = slot.querySelectorAll(".card");
@@ -170,7 +167,7 @@ function flipTopCard(slot) {
 }
 
 // --------------------
-// 1～13完成チェック
+// 1～13 完成チェック
 // --------------------
 function checkComplete(slot) {
     const cards = Array.from(slot.querySelectorAll(".card"));
@@ -183,12 +180,9 @@ function checkComplete(slot) {
         if (
             Number(last13[i].dataset.number) !== 13 - i ||
             last13[i].dataset.suit !== suit
-        ) {
-            return;
-        }
+        ) return;
     }
 
-    // 完成 → まとめる
     last13.forEach(c => c.remove());
     flipTopCard(slot);
     createCompletedCard(suit);
