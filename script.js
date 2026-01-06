@@ -3,13 +3,15 @@ const slots = document.querySelectorAll(".slot");
 // --------------------
 // カード準備（52枚ランダム）
 // --------------------
-const suits = ["♡", "♧", "♤", "♢"];
+const suits = ["♤", "♢"];
 const numbers = Array.from({ length: 13 }, (_, i) => i + 1);
 
 let cards = [];
-for (const suit of suits) {
-    for (const number of numbers) {
-        cards.push({ number, suit });
+for (let d = 0; d < 2; d++) {   // デッキ2個
+    for (const suit of suits) {
+        for (const number of numbers) {
+            cards.push({ number, suit });
+        }
     }
 }
 
